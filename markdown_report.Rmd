@@ -1,0 +1,157 @@
+---
+title: "7 days of Pokemon Go - a statistical analysis"
+author: "Juan De Dios Santos"
+date: "July 30, 2016"
+output: html_document
+---
+
+```{r, echo=FALSE, include=FALSE}
+require(ggplot2)
+require(dplyr)
+require(reshape2)
+```
+
+```{r, echo=FALSE}
+# Load data
+pokemon <- read.csv("~/Development/R/PokemonGo/data/Pokemon.csv",
+                    stringsAsFactors=TRUE)
+items <- read.csv("~/Development/R/PokemonGo/data/Items.csv",
+                  stringsAsFactors=FALSE)
+pidgey <- read.csv("~/Development/R/PokemonGo/data/Pidgey.csv",
+                   stringsAsFactors=FALSE)
+drowzee <- read.csv("~/Development/R/PokemonGo/data/Drowzee.csv",
+                    stringsAsFactors=FALSE)
+
+# Converts NA's to 0
+items[is.na(items)]<-0
+```
+
+## Introduction
+***
+
+Pokemon Go is finally out. Like every 90' kid (and as a huge fan of the series), I have spent a considerable amount time catching our beloved digital creatures. However, besides spending battery life and swiping my screen like a maniac, I also spent
+some of my break (mostly while charging my phone) to log some of the data from
+ingame events. The purpose of this was to take a statistical look at the patterns, and
+behavior of the game as I went up several levels.
+
+In this analysis, I will present, through several images, tables, and statistical models, how the game rewards you as you level up, how the combat power (CP) of the
+Pokemon increase, and an interesting relationship found between several of the
+stats of the Pokemon.
+
+## The data
+***
+During the course of 9 days - from July 12 to July 19 - I annotated mostly all
+of the Pokemon catches and items obtained from Pokestops, a total of 297 Pokemon,
+and 271 Pokestops used. For those of you who do not have knowledge about the game,
+a Pokestop is an in-game location based on a real life place, in which the player
+can get a random amount of items. For example, Pokestop X could drop me 3 random
+items, and Pokestop Y, 5.
+
+I would like to note that the amount of Pokemon captured and Pokestops used
+vary per day, in other words you will see that in some days I had more activity than
+in others. This means that my data is biased towards some days.
+
+## Pokemon
+The first section of this report focuses on the captured Pokemon. The next
+table shows a summary of the captured Pokemon per day, the top Pokemon caught
+and some statistics about the CP.
+
+```{r, echo=FALSE}
+summary(pokemon, maxsum = 9)
+```
+
+As mentioned at the beginning, the activity is quite different across the 9 days.
+On the 17th, apparently the servers were down because I just have a total of 
+5 captured Pokemon. However the day after that, I went back to business and got
+a total of 42 Pokemon.
+
+```{r, echo=FALSE}
+ggplot(pokemon, aes(x=Date)) +
+  geom_histogram(aes(fill = ..count..)) +
+  ggtitle("Amount of Pokemon per day")
+```
+
+July 13 was the day with the highest amount of captured Pokemon (57), while
+July 17 was the day with the lowest amount (5)
+
+The next plot shows the captured Pokemon
+
+```{r, echo=FALSE}
+ggplot(pokemon, aes(x=reorder(Pokemon, Pokemon,
+                                   function(x) - length(x)))) + 
+  geom_bar() + theme(axis.text.x = element_text(angle = 90, vjust = 1)) +
+  ggtitle("Pokemon counter") +
+  xlab("Pokemon") +
+  ylab("Count")
+```
+
+Drowzee seems to be the most common (or one of the most common) Pokemon in my city because, during those days I captured a total of 59 (19.86%). Followed by Drowzee
+we have 54 Pidgey (18.18%), and in the third position, Rattata, with a total of
+41 captures (13.80%)
+
+Let's shift our focus to the combat power (CP) of the captured Pokemon.
+The summary of the data shown before, shows that the weakest Pokemon captured
+had a CP of 10, while the strongest one was a mighty Snowlax. But what's in between
+them? Well, let's see.
+
+The following plot is a boxplot of the CP. The most important detail about it,
+is that it shows that the data is skewed right, meaning that most of the 
+observations are on the lower end of the data. The dots at the top are the outliers,
+CP that are more 1.5 times of the third quartile, which is 238.0.
+
+```{r, echo=FALSE}
+qplot(y=pokemon$CP, x= 1, geom = "boxplot", main = "Boxplot of CP",
+      ylab = "Combat Power (CP)", xlab = NULL)
+```
+
+The figure below shows more in detail the CP for each Pokemon, with the highest ones
+annotated. As shown in the boxplot and the summary, we can see that most
+of the points are below the 250 mark. However, what I wanted to show here is
+that the CP score seems to increase on the latter days, and the reason is because
+I was leveling up continuosly.
+
+```{r, echo=FALSE}
+ggplot(pokemon, aes(Date, CP)) +
+  geom_point(aes(alpha = 1/6)) +
+  annotate("text", x = 3, y = 800, label = c("Snorlax")) +
+  annotate("text", x = 9, y = 700, label = c("Kingler")) +
+  ggtitle("CP over time")
+```
+
+To further check the increasement of CP per day, the next two plots show the
+mean and the standard deviation per day.
+
+```{r, echo=FALSE}
+# Mean and CP per day
+cp <- data.frame(cp = pokemon$CP, index = 1:nrow(pokemon))
+by_date <- group_by(pokemon, Date)
+by_date <-summarise(by_date, mean(CP), sd(CP))
+colnames(by_date) <- c("date", "mean", "sd")
+```
+
+```{r, echo=FALSE}
+ggplot(by_date, aes(date,mean)) +
+  geom_bar(stat = "identity") +
+  ggtitle("Mean of CP over day")
+```
+
+```{r, echo=FALSE}
+ggplot(by_date, aes(date,sd)) + 
+  geom_bar(stat = "identity") +
+  ggtitle("Standard deviation (sd) of CP over day")
+```
+
+In both of them we can see how on the last days the CP increased.
+
+
+To conclude this section, I will present all the different combat powers, alongside
+a regression line.
+
+```{r, echo=FALSE}
+p <- ggplot(cp, aes(index, cp))
+p + geom_point() + geom_smooth(method=lm) 
+```
+
+Once again, more increasement!
+
+## Items

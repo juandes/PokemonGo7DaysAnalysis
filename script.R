@@ -66,13 +66,18 @@ p + geom_point() + geom_smooth(method=lm)
 
 # Items
 summary(items)
+sum(items[2:ncol(items)])
+sum(items[2:ncol(items)]) / nrow(items)
 items.frequency <- as.data.frame(colSums(items[2:ncol((items))]))
 prop.table(items.frequency) * 100
 items.frequency <- cbind(row.names(items.frequency), items.frequency)
 colnames(items.frequency) <- c("Item", "Frequency")
 items.frequency <- data.frame(Item = items.frequency$Item, Frequency = as.integer(items.frequency$Frequency))
-ggplot(items.frequency, aes(x = reorder(Item, -Frequency), y = Frequency, fill = Item)) + 
-  geom_bar(stat = "identity")
+ggplot(items.frequency,
+       aes(x = reorder(Item, -Frequency),y = Frequency, fill = Item)) + geom_bar(stat = "identity") +
+  ggtitle("Total of items obtained at Pokestops") +
+  xlab("Item") +
+  ylab("Total")
 
 p <- ggplot(items, aes(Date, Pokeball))
 p + geom_point()
@@ -124,7 +129,8 @@ all.potions <- data.frame(date = potions.by_date$date,
 
 all.potions <- melt(all.potions)
 ggplot(all.potions, aes(x = date, y = value, fill = variable)) +
-  geom_bar(stat='identity')
+  geom_bar(stat='identity') +
+  xlab("Date") + ylab("Value") + ggtitle("Amount of potions by day")
 
 ## Amount of items per day
 items.per.date <- data.frame(date = items$Date, frequency = rowSums(items[2:8]))
@@ -138,18 +144,20 @@ ggplot(items.per.date, aes(x = date, y = frequency))  + geom_bar(stat = "identit
 
 ## Drowzees
 summary(drowzee)
-ggplot(drowzee, aes(x = HP, y = CP)) + geom_point() + geom_smooth(method=lm)
+ggplot(drowzee, aes(x = CP, y = HP)) + geom_point() + geom_smooth(method=lm) +
+  ggtitle("Drowzee's HP and CP with regression line")
 cor(drowzee$CP, drowzee$HP)
 drowzee.lr <- lm(HP ~ CP, data = drowzee)
 summary(drowzee.lr)
-plot(drowzee$HP, drowzee$CP)
+plot(drowzee$CP, drowzee$HP)
 abline(lm(drowzee$CP~drowzee$HP), col="red")
 hist(drowzee.lr$residuals, breaks = 100)
 
 
 ## Pidgey
 summary(pidgey)
-ggplot(pidgey, aes(x = HP, y = CP)) + geom_point() + geom_smooth(method=lm)
+ggplot(pidgey, aes(x = HP, y = CP)) + geom_point() + geom_smooth(method=lm) +
+  ggtitle("Pidgey's CP and HP with regression line")
 cor(pidgey$CP, pidgey$HP)
 pidgey.lr <- lm(HP ~ CP, data = pidgey)
 summary(pidgey.lr)

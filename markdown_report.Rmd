@@ -26,19 +26,22 @@ drowzee <- read.csv("~/Development/R/PokemonGo/data/Drowzee.csv",
 items[is.na(items)]<-0
 ```
 
-## Introduction
+# Introduction
 ***
 
 Pokemon Go is finally out. Like every 90' kid (and as a huge fan of the series), I have spent a considerable amount time catching our beloved digital creatures. However, besides spending battery life and swiping my screen like a maniac, I also spent
-some of my break (mostly while charging my phone) to log some of the data from
-ingame events. The purpose of this was to take a statistical look at the patterns, and
-behavior of the game as I went up several levels.
+some time (mostly while charging my phone) logging some of the data from the
+in-game events. The purpose of this was to take a statistical look at the patterns, and
+behaviour of the game as the player progress in the game.
 
 In this analysis, I will present, through several images, tables, and statistical models, how the game rewards you as you level up, how the combat power (CP) of the
-Pokemon increase, and an interesting relationship found between several of the
-stats of the Pokemon.
+Pokemon increase, and an interesting relationship found the CP and the hit points
+(HP) of the Pokemon.
 
-## The data
+Note: If you are looking for a quick read, and are interested in more advanced
+topics, I suggest to start or just read the last section, titled *Drowzees, Pidgeys, CP and HP*.
+
+# The data
 ***
 During the course of 9 days - from July 12 to July 19 - I annotated mostly all
 of the Pokemon catches and items obtained from Pokestops, a total of 297 Pokemon,
@@ -51,7 +54,11 @@ I would like to note that the amount of Pokemon captured and Pokestops used
 vary per day, in other words you will see that in some days I had more activity than
 in others. This means that my data is biased towards some days.
 
-## Pokemon
+Also, at the start of the experiment my player level was 9, and 18 at the end.
+
+# Pokemon
+***
+
 The first section of this report focuses on the captured Pokemon. The next
 table shows a summary of the captured Pokemon per day, the top Pokemon caught
 and some statistics about the CP.
@@ -154,4 +161,214 @@ p + geom_point() + geom_smooth(method=lm)
 
 Once again, more increasement!
 
-## Items
+# Items
+***
+Moving aside from the topic of Pokemon (at least for now), in this section I will
+focus on the topic of items. As mentioned at the beginning, I hit a total of 271
+Pokestop during the 9 days of the experiment, resulting in a considerable amount
+of items. This part of all about these items. What's the total of items? How did
+they changed overtime? How are they distributed? These are my main questions.
+
+The total number of items acquired through the Pokestops were 886, an average of 
+3.27 items per Pokestop. In the following table I will present the frequency of
+these items, their percentage, and some basic properties of the dataset regarding
+the quantity of items awarded at each Pokestop.
+
+| Item         | Frequency | Percentage |  Median  | Mean | Max
+| -------------| --------- | ---------- | -------- |------|-----
+| Pokeball     | 546       |  61.62%    | 2.00     | 2.02 | 5.00
+| Great Ball   | 103       |  11.62%    | 0.00     | 0.38 | 2.00
+| Potion       | 65        |  7.33%     | 0.00     | 0.24 | 2.00
+| Super Potion | 41        |  4.62%     | 0.00     | 0.15 | 2.00
+| Hyper Potion | 7         |  0.79%     | 0.00     | 0.03 | 1.00
+| Razz Berry   | 69        |  7.78%     | 0.00     | 0.25 | 2.00
+| Revive       | 55        |  6.20%     | 0.00     | 0.20 | 2.00
+
+According to the data, Pokeballs were the most common item obtained at the Pokestops,
+with a frequency of 546 or 61.62%, a median of 2 per stop, mean of 2.02, and
+a maximum of 5, meaning at one Pokestop dropped 5 Pokeballs. On the other hand,
+Hyper Potion was the least common item; just 7 Hyper Potions were acquired (0.79%)
+A peculiarity of this data is the fact that the median of all the items, except
+Pokeball, was 0. The two boxplot below display this; on the Pokeball boxplot
+we can clearly see the bold line which states the median, however the second one
+shows that the data is strongly skewed to the right.
+
+```{r, echo=FALSE}
+items.frequency <- as.data.frame(colSums(items[2:ncol((items))]))
+items.frequency <- cbind(row.names(items.frequency), items.frequency)
+colnames(items.frequency) <- c("Item", "Frequency")
+
+items.frequency <- data.frame(Item = items.frequency$Item,
+                              Frequency =as.integer(items.frequency$Frequency))
+
+ggplot(items.frequency,
+       aes(x = reorder(Item, -Frequency),y = Frequency, fill = Item)) + geom_bar(stat = "identity") +
+  ggtitle("Total of items obtained at Pokestops") +
+  xlab("Item") +
+  ylab("Total")
+```
+
+
+
+```{r, echo=FALSE}
+qplot(y=items$Pokeball, x= 1, geom = "boxplot", main = "Distribution of Pokeball",
+      ylab = "Total of Pokeball", xlab = NULL)
+qplot(y=items$Great.Ball, x= 1, geom = "boxplot", main = "Distribution of Great Ball",
+      ylab = "Total of Great Ball", xlab = NULL)
+```
+
+One particular detail I wanted to investigate was the decreasement of the amount
+of potions acquired as the result of levelling up, because I had the assumption
+that this number was going to decrease drastly as new items (super and hyper potion),
+were being unlocked.
+
+| Item         | 7/13/2016 | 7/14/2016 |  7/15/2016  | 7/16/2016 | 7/17/2016 | 7/18/2016 | 7/19/2016 | 7/20/2016
+| -------------| --------- | ---------- | -------- |------ |-----|-----|-----|
+| Potion       | 14 (70%) |  12 (55%) | 13 (93%) | 5 (50%) | 7 (41%)  |  5 (50%) | 9 (45%) |
+| Super Potion | 6  (30%) |  10 (45%) | 0  (0%)  | 5 (50%) | 8 (47%)  |  4 (40%) | 8 (40%) |
+| Hyper Potion | 0  (0%)  |  0  (0%)  | 1  (7%)  | 0 (0%)  | 2 (11%)  |  1 (10%) | 3  (15%)|
+| **Total**    | 20       |  22       | 14       | 10      | 17       |  10      | 20 |
+
+
+```{r, echo=FALSE, warning=FALSE}
+potions <-data.frame(date = items$Date, potion = items$Potion)
+potions.by_date <- group_by(potions, date)
+potions.by_date <- summarise(potions.by_date, Frequency = sum(potion))
+
+s.potions <-data.frame(date = items$Date, potion = items$Super.Potion)
+s.potions.by_date <- group_by(s.potions, date)
+s.potions.by_date <- summarise(s.potions.by_date, Frequency = sum(potion))
+
+h.potions <-data.frame(date = items$Date, potion = items$Hyper.Potion)
+h.potions.by_date <- group_by(h.potions, date)
+h.potions.by_date <- summarise(h.potions.by_date, Frequency = sum(potion))
+
+all.potions <- data.frame(date = potions.by_date$date,
+                          potion = potions.by_date$Frequency,
+                          s.potion = s.potions.by_date$Frequency,
+                          h.potion = h.potions.by_date$Frequency)
+
+all.potions <- melt(all.potions)
+ggplot(all.potions, aes(x = date, y = value, fill = variable)) +
+  geom_bar(stat='identity') +
+  xlab("Date") + ylab("Value") + ggtitle("Amount of potions by day")
+```
+
+The above table and plot showed that "somehow" my assumption was right because after
+the first day (with the exception of the third one), the percentage of Potions decreased, while the number of Super and Hyper Potions growed. However I wouldn't call this a definitive conclusion due to the small data sample.
+
+The last visualization regarding the topic of items presents the total number of items
+obtained across the seven days.
+
+# Drowzees, Pidgeys, CP and HP
+***
+
+In Pokemon Go, the higher the combat power (CP) of a Pokemon is, the higher
+the hit points (HP) is - this is a basic observation can be seen in the first
+minutes of the game. Despite knowing this, I wanted to see how exactly it worked,
+so I ran a (simple) linear regression to study this behaviour using the CP and HP of my two most common Pokemon: Drowzee and Pidgey.
+
+In layman's terms, a simple linear regression is a statistical approach for modelling
+the relationship between a dependent variable, and one or several independent variables, by fitting a linear equation that is estimated from the data.
+
+This is the equation of a linear regression line: $Y = a+bX$
+Where $Y$ is the dependent variable (what we want to predict), in our case this is
+the HP, $X$ is the independent or explanatory variable, the CP, $a$ is the y-intercept
+of the value of $y$ when $x=0$, and $b$ is the slope.
+
+Before continuing with the regressions, I would like to state that the observed
+Pearson's correlation between the CP and HP for Drowzee is 0.974654, while the one
+for Pidgey is 0.9796001, an almost perfect positive correlation.
+
+For more information about linear regression I suggest the following [link](http://www.stat.yale.edu/Courses/1997-98/101/linreg.htm), and as for
+correlations, this [page](https://www.mathsisfun.com/data/correlation.html) offers a quick and easy to follow explanation.
+
+Now, I will present the result of the linear regression using the **Drowzee**.
+
+```{r, echo=FALSE}
+drowzee.lr <- lm(HP ~ CP, data = drowzee)
+summary(drowzee.lr)
+plot(density(resid(drowzee.lr)), main ='Density plot of the residuals of the Drowzee model')
+# mean(drowzee.lr$residuals)
+# sd(drowzee.lr$residuals)
+```
+
+At the top of the summary of the linear regression are the residuals. The residuals
+are the difference between the real value of the variable and the predicted value
+of the prediction. The residuals for this model are good, the mean practically 0, the standard deviation is 3.89, and a density plot of them shapes a normal distribution.
+
+Another metric that shows that the fit is good, is the p-value of the CP variable.
+Since p-values are a bit hard to understand, and they are out of the scope of
+this report, just believe me when I say that in this case the smaller the number
+is, the better, and in this particular case the p-value is 
+$2e-16$ which a really small number.
+
+The last metric I will use to analyse the goodness of the model is the R-squared
+or coefficient of determination statistic. Like the p-value, this value is also
+complicated to understand, so once again please bear with me when I say that the
+closest it is to 1 (not in every case!) the better it is. In this case the R-squared
+is 0.95.
+
+What about the intercept and the slope? The y-intercept is 17.70, and the slope
+is 0.12. Thus, the regression line equation is: $Y = 17.70+0.12 * X$, and it looks
+like this:
+
+
+```{r, echo=FALSE}
+ggplot(drowzee, aes(x = CP, y = HP)) + geom_point() + geom_smooth(method=lm) +
+  ggtitle("Drowzee's HP and CP with regression line")
+```
+
+Now the same but for **Pidgey**.
+
+```{r, echo=FALSE}
+pidgey.lr <- lm(HP ~ CP, data = pidgey)
+summary(pidgey.lr)
+plot(density(resid(pidgey.lr)), main ='Density plot of the residuals of the Pidgey model')
+# mean(pidgey.lr$residuals)
+# sd(pidgey.lr$residuals)
+```
+
+
+At a single glimpse, I could see that this model is as effective and similar to the
+previous one. The residuals are acceptable (mean close to 0), and standard deviation
+of 2.30. The p-value is also really close to 0, and the R-squared is 0.96.
+
+The regression line equation is: $Y = 12.04+0.14 * X$
+
+```{r, echo=FALSE}
+ggplot(pidgey, aes(x = HP, y = CP)) + geom_point() + geom_smooth(method=lm) +
+  ggtitle("Pidgey's CP and HP with regression line")
+```
+
+
+# Conclusion
+***
+In this report I presented the results of an experiment done using personal data
+collected from Pokemon Go during the span of nine days. The analysis started with an
+overview of the top Pokemon in my area, Drowzee and Pidgey, the evolution of the
+combat power over time and several stats about it. 
+
+The second topic discuss were the items, and how they are distributed,
+
+For the last topic I introduced two linear regression to study the relationship
+between the combat power and the hit points of the Pokemon. The results were pretty
+satisfactory and showed that there is indeed a correlation and linear relationship
+between both features.
+
+
+
+
+# Notes and disclaimers
+***
+
+* If you spot a typo, or any error in the analysis, feel free to notify me.
+* This work is licensed under a [Creative Commons Attribution-NonCommercial 4.0 International License](http://creativecommons.org/licenses/by-nc/4.0/). In other words, feel free to use it, share it, edit it for non-commercial purposes and please, give credit.
+* ©2016 Niantic, Inc. ©2016 Pokémon. ©1995–2016 Nintendo / Creatures Inc. / GAME FREAK inc. Pokémon and Pokémon character names are trademarks of Nintendo.
+
+
+
+
+
+
+

@@ -1,7 +1,7 @@
 ---
 title: "7 days of Pokemon Go - a statistical analysis"
 author: "Juan De Dios Santos"
-date: "July 30, 2016"
+date: "August 7, 2016"
 output: html_document
 ---
 
@@ -34,7 +34,7 @@ some time (mostly while charging my phone) logging some of the data from the
 in-game events. The purpose of this was to take a statistical look at the patterns, and
 behaviour of the game as the player progress in the game.
 
-In this analysis, I will present, through several images, tables, and statistical models, how the game rewards you as you level up, how the combat power (CP) of the
+In this analysis I will present, through several images, tables, and statistical models, how the game rewards you as you level up, how the combat power (CP) of the
 Pokemon increase, and an interesting relationship found the CP and the hit points
 (HP) of the Pokemon.
 
@@ -43,7 +43,7 @@ topics, I suggest to start or just read the last section, titled *Drowzees, Pidg
 
 # The data
 ***
-During the course of 9 days - from July 12 to July 19 - I annotated mostly all
+During the course of nine days - from July 12 to July 19 - I annotated mostly all
 of the Pokemon catches and items obtained from Pokestops, a total of 297 Pokemon,
 and 271 Pokestops used. For those of you who do not have knowledge about the game,
 a Pokestop is an in-game location based on a real life place, in which the player
@@ -67,7 +67,7 @@ and some statistics about the CP.
 summary(pokemon, maxsum = 9)
 ```
 
-As mentioned at the beginning, the activity is quite different across the 9 days.
+As mentioned at the beginning, the activity is quite different across the nine days.
 On the 17th, apparently the servers were down because I just have a total of 
 5 captured Pokemon. However the day after that, I went back to business and got
 a total of 42 Pokemon.
@@ -79,9 +79,9 @@ ggplot(pokemon, aes(x=Date)) +
 ```
 
 July 13 was the day with the highest amount of captured Pokemon (57), while
-July 17 was the day with the lowest amount (5)
+July 17 was the day with the lowest amount (5).
 
-The next plot shows the captured Pokemon
+The next plot shows the captured Pokemon.
 
 ```{r, echo=FALSE}
 ggplot(pokemon, aes(x=reorder(Pokemon, Pokemon,
@@ -92,40 +92,39 @@ ggplot(pokemon, aes(x=reorder(Pokemon, Pokemon,
   ylab("Count")
 ```
 
-Drowzee seems to be the most common (or one of the most common) Pokemon in my city because, during those days I captured a total of 59 (19.86%). Followed by Drowzee
-we have 54 Pidgey (18.18%), and in the third position, Rattata, with a total of
-41 captures (13.80%)
+Drowzee seems to be the most common (or one of the most common) Pokemon in my city because during those days I captured a total of 59, or 19.86% if it is compared against the rest. Followed by Drowzee there are 54 Pidgey (18.18%), and in the third position, Rattata, with a total of 41 captures (13.80%).
 
 Let's shift our focus to the combat power (CP) of the captured Pokemon.
-The summary of the data shown before, shows that the weakest Pokemon captured
-had a CP of 10, while the strongest one was a mighty Snowlax. But what's in between
-them? Well, let's see.
+The summary of the data shown before shows that the weakest Pokemon
+had a CP of 10, while the strongest one was a mighty Snorlax with a CP of 878.
+But what's in between them? Well, let's see.
 
-The following plot is a boxplot of the CP. The most important detail about it,
+The following plot is a boxplot of the CP. The most important detail about it
 is that it shows that the data is skewed right, meaning that most of the 
 observations are on the lower end of the data. The dots at the top are the outliers,
-CP that are more 1.5 times of the third quartile, which is 238.0.
+or Pokemon whose CP are more than 1.5 times the third quartile, which is 238.0.
 
 ```{r, echo=FALSE}
 qplot(y=pokemon$CP, x= 1, geom = "boxplot", main = "Boxplot of CP",
       ylab = "Combat Power (CP)", xlab = NULL)
 ```
 
-The figure below shows more in detail the CP for each Pokemon, with the highest ones
+The figure below shows a detailed view the CP for each Pokemon, with the highest ones
 annotated. As shown in the boxplot and the summary, we can see that most
 of the points are below the 250 mark. However, what I wanted to show here is
 that the CP score seems to increase on the latter days, and the reason is because
-I was leveling up continuosly.
+I was leveling up continuously.
 
 ```{r, echo=FALSE}
 ggplot(pokemon, aes(Date, CP)) +
   geom_point(aes(alpha = 1/6)) +
   annotate("text", x = 3, y = 800, label = c("Snorlax")) +
   annotate("text", x = 9, y = 700, label = c("Kingler")) +
-  ggtitle("CP over time")
+  ggtitle("CP over time") +
+  theme(legend.position="none")
 ```
 
-To further check the increasement of CP per day, the next two plots show the
+To further check the increase of CP per day, the next two plots show the
 mean and the standard deviation per day.
 
 ```{r, echo=FALSE}
@@ -150,26 +149,27 @@ ggplot(by_date, aes(date,sd)) +
 
 In both of them we can see how on the last days the CP increased.
 
-
 To conclude this section, I will present all the different combat powers, alongside
 a regression line.
 
 ```{r, echo=FALSE}
 p <- ggplot(cp, aes(index, cp))
-p + geom_point() + geom_smooth(method=lm) 
+p + geom_point() + geom_smooth(method=lm) +
+  ggtitle("Combat Power of all the captured Pokemon")
 ```
 
-Once again, more increasement!
+Once again, more increase.
 
 # Items
 ***
-Moving aside from the topic of Pokemon (at least for now), in this section I will
-focus on the topic of items. As mentioned at the beginning, I hit a total of 271
-Pokestop during the 9 days of the experiment, resulting in a considerable amount
-of items. This part of all about these items. What's the total of items? How did
-they changed overtime? How are they distributed? These are my main questions.
 
-The total number of items acquired through the Pokestops were 886, an average of 
+Moving aside from the topic of Pokemon, in this section I will
+focus on the topic of items. As mentioned at the beginning, I hit a total of 271
+Pokestops during the nine days of the experiment, resulting in a considerable amount
+of items - this part is about those items. What's the total of items? How did
+they change overtime? How are they distributed? These are my main questions.
+
+The total number of items acquired through the Pokestops was 886, an average of 
 3.27 items per Pokestop. In the following table I will present the frequency of
 these items, their percentage, and some basic properties of the dataset regarding
 the quantity of items awarded at each Pokestop.
@@ -185,12 +185,12 @@ the quantity of items awarded at each Pokestop.
 | Revive       | 55        |  6.20%     | 0.00     | 0.20 | 2.00
 
 According to the data, Pokeballs were the most common item obtained at the Pokestops,
-with a frequency of 546 or 61.62%, a median of 2 per stop, mean of 2.02, and
-a maximum of 5, meaning at one Pokestop dropped 5 Pokeballs. On the other hand,
-Hyper Potion was the least common item; just 7 Hyper Potions were acquired (0.79%)
+with a final counter of 546 or 61.62%, a median of 2 per stop, a mean of 2.02, and
+a maximum of 5, meaning that one Pokestop dropped 5 Pokeballs. On the other hand,
+Hyper Potion was the least common item; just 7 of them were acquired (0.79%).
 A peculiarity of this data is the fact that the median of all the items, except
 Pokeball, was 0. The two boxplot below display this; on the Pokeball boxplot
-we can clearly see the bold line which states the median, however the second one
+we can clearly see the bold line that states the median, however the second one
 shows that the data is strongly skewed to the right.
 
 ```{r, echo=FALSE}
@@ -217,9 +217,9 @@ qplot(y=items$Great.Ball, x= 1, geom = "boxplot", main = "Distribution of Great 
       ylab = "Total of Great Ball", xlab = NULL)
 ```
 
-One particular detail I wanted to investigate was the decreasement of the amount
-of potions acquired as the result of levelling up, because I had the assumption
-that this number was going to decrease drastly as new items (super and hyper potion),
+One particular detail I wanted to investigate was the decrease of the amount
+of potions acquired as the result of leveling up, because I had the assumption
+that this number would decrease as new items (Super and Hyper Potion),
 were being unlocked.
 
 | Item         | 7/13/2016 | 7/14/2016 |  7/15/2016  | 7/16/2016 | 7/17/2016 | 7/18/2016 | 7/19/2016 | 7/20/2016
@@ -230,7 +230,7 @@ were being unlocked.
 | **Total**    | 20       |  22       | 14       | 10      | 17       |  10      | 20 |
 
 
-```{r, echo=FALSE, warning=FALSE}
+```{r, echo=FALSE, message=FALSE}
 potions <-data.frame(date = items$Date, potion = items$Potion)
 potions.by_date <- group_by(potions, date)
 potions.by_date <- summarise(potions.by_date, Frequency = sum(potion))
@@ -255,7 +255,7 @@ ggplot(all.potions, aes(x = date, y = value, fill = variable)) +
 ```
 
 The above table and plot showed that "somehow" my assumption was right because after
-the first day (with the exception of the third one), the percentage of Potions decreased, while the number of Super and Hyper Potions growed. However I wouldn't call this a definitive conclusion due to the small data sample.
+the first day (with the exception of the third one), the percentage of Potions decreased, while the number of Super and Hyper Potions incremented. However I wouldn't call this a definitive conclusion due to the small data sample.
 
 The last visualization regarding the topic of items presents the total number of items
 obtained across the seven days.
@@ -297,7 +297,7 @@ At the top of the summary of the linear regression are the residuals. The residu
 are the difference between the real value of the variable and the predicted value
 of the prediction. The residuals for this model are good, the mean practically 0, the standard deviation is 3.89, and a density plot of them shapes a normal distribution.
 
-Another metric that shows that the fit is good, is the p-value of the CP variable.
+Another metric that shows that the fit is good is the p-value of the CP variable.
 Since p-values are a bit hard to understand, and they are out of the scope of
 this report, just believe me when I say that in this case the smaller the number
 is, the better, and in this particular case the p-value is 
@@ -344,6 +344,7 @@ ggplot(pidgey, aes(x = HP, y = CP)) + geom_point() + geom_smooth(method=lm) +
 
 # Conclusion
 ***
+
 In this report I presented the results of an experiment done using personal data
 collected from Pokemon Go during the span of nine days. The analysis started with an
 overview of the top Pokemon in my area, Drowzee and Pidgey, the evolution of the
@@ -351,13 +352,15 @@ combat power over time and several stats about it.
 
 The second topic discuss were the items, and how they are distributed,
 
-For the last topic I introduced two linear regression to study the relationship
+For the last topic I introduced two linear regressions to study the relationship
 between the combat power and the hit points of the Pokemon. The results were pretty
 satisfactory and showed that there is indeed a correlation and linear relationship
 between both features.
 
+That's it for now! If you have any suggestions, idea or more data you would
+like to share, please do.
 
-
+Thanks for reading.
 
 # Notes and disclaimers
 ***

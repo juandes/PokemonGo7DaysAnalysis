@@ -1,5 +1,5 @@
 ---
-title: "7 days of Pokemon Go - a statistical analysis"
+title: "9 days of Pokemon Go - a statistical analysis"
 author: "Juan De Dios Santos"
 date: "August 7, 2016"
 output: html_document
@@ -44,33 +44,30 @@ topics, I suggest to start or just read the last section, titled *Drowzees, Pidg
 # The data
 ***
 During the course of nine days - from July 12 to July 19 - I annotated mostly all
-of the Pokemon catches and items obtained from Pokestops, a total of 297 Pokemon,
-and 271 Pokestops used. For those of you who do not have knowledge about the game,
+my Pokemon catches and items obtained from Pokestops, a total of 297 Pokemon,
+and 271 Pokestops visited. For those of you who do not have knowledge about the game,
 a Pokestop is an in-game location based on a real life place, in which the player
-can get a random amount of items. For example, Pokestop X could drop me 3 random
-items, and Pokestop Y, 5.
+can get a random amount of items. For example, Pokestop *X* could drop me 3 random
+items, and Pokestop *Y*, 5.
 
-I would like to note that the amount of Pokemon captured and Pokestops used
+I would like to note that the amount of Pokemon captured and Pokestops visited
 vary per day, in other words you will see that in some days I had more activity than
 in others. This means that my data is biased towards some days.
 
 Also, at the start of the experiment my player level was 9, and 18 at the end.
 
-# Pokemon
+# The Pokemon
 ***
 
-The first section of this report focuses on the captured Pokemon. The next
-table shows a summary of the captured Pokemon per day, the top Pokemon caught
-and some statistics about the CP.
+The first section of this report focuses on the 297 captured Pokemon. The next
+table shows a summary of the catches per day, the most frequent Pokemon caught
+and some basic statistics about the CP.
 
 ```{r, echo=FALSE}
 summary(pokemon, maxsum = 9)
 ```
 
-As mentioned at the beginning, the activity is quite different across the nine days.
-On the 17th, apparently the servers were down because I just have a total of 
-5 captured Pokemon. However the day after that, I went back to business and got
-a total of 42 Pokemon.
+As mentioned during the introduction, the game time activity is quite different across the nine days. On the 17th, apparently the servers were down because I just have a total of 5 captured Pokemon. However the day after that, I went back to business and got a total of 42 Pokemon.
 
 ```{r, echo=FALSE}
 ggplot(pokemon, aes(x=Date)) +
@@ -78,42 +75,44 @@ ggplot(pokemon, aes(x=Date)) +
   ggtitle("Amount of Pokemon per day")
 ```
 
-July 13 was the day with the highest amount of captured Pokemon (57), while
-July 17 was the day with the lowest amount (5).
+July 13 was the day with the highest activity; a total of 57 were captured.
+On the other hand, July 17 was a sad day. Just five Pokemon were caught.
 
-The next plot shows the captured Pokemon.
+Now that I have show the total amount of Pokemon captured, I will proceed to
+display exactly how many of each specie were caught.
 
 ```{r, echo=FALSE}
 ggplot(pokemon, aes(x=reorder(Pokemon, Pokemon,
                                    function(x) - length(x)))) + 
   geom_bar() + theme(axis.text.x = element_text(angle = 90, vjust = 1)) +
-  ggtitle("Pokemon counter") +
+  ggtitle("Pokemon count by species") +
   xlab("Pokemon") +
   ylab("Count")
 ```
 
-Drowzee seems to be the most common (or one of the most common) Pokemon in my city because during those days I captured a total of 59, or 19.86% if it is compared against the rest. Followed by Drowzee there are 54 Pidgey (18.18%), and in the third position, Rattata, with a total of 41 captures (13.80%).
+Drowzee seems to be the most common (or one of the most common) Pokemon in my city because during those days I captured a total of 59, or 19.86% if it is compared against the rest. Followed by Drowzee there are 54 Pidgey (18.18%), and in the third position, Rattata, with a total of 41 captures (13.80%). On the other side of the spectrum there is a single Beedrill, Gloom, Golbat, Jigglypuff, Kakuna, Nidoran♂, Pidgeot, Psyduck, Shellder, Snorlax and Voltorb.
 
 Let's shift our focus to the combat power (CP) of the captured Pokemon.
 The summary of the data shown before shows that the weakest Pokemon
 had a CP of 10, while the strongest one was a mighty Snorlax with a CP of 878.
-But what's in between them? Well, let's see.
+But what's values are in between the weakest and the strongest Pokemon? Let's
+take a look.
 
-The following plot is a boxplot of the CP. The most important detail about it
+The following plot is a box plot of the CP. The most important detail about it
 is that it shows that the data is skewed right, meaning that most of the 
-observations are on the lower end of the data. The dots at the top are the outliers,
-or Pokemon whose CP are more than 1.5 times the third quartile, which is 238.0.
+observations are on the lower end of the data. The dots at the top are the outliers, or Pokemon whose CP are more than 1.5 times the third quartile, which is 238.0.
 
 ```{r, echo=FALSE}
 qplot(y=pokemon$CP, x= 1, geom = "boxplot", main = "Boxplot of CP",
       ylab = "Combat Power (CP)", xlab = NULL)
 ```
 
-The figure below shows a detailed view the CP for each Pokemon, with the highest ones
-annotated. As shown in the boxplot and the summary, we can see that most
-of the points are below the 250 mark. However, what I wanted to show here is
-that the CP score seems to increase on the latter days, and the reason is because
-I was leveling up continuously.
+The figure below shows a detailed view the CP for each Pokemon, with the highest ones annotated. As shown in the box plot and the summary, we can see that most
+of the points are below the 250 mark.
+
+One of my objectives in this section was to see if there is a significant increase of the CP on the latter days. So I took a look at the CP over the
+nine days and plotted them in several ways.
+
 
 ```{r, echo=FALSE}
 ggplot(pokemon, aes(Date, CP)) +
@@ -124,8 +123,8 @@ ggplot(pokemon, aes(Date, CP)) +
   theme(legend.position="none")
 ```
 
-To further check the increase of CP per day, the next two plots show the
-mean and the standard deviation per day.
+By looking at this I cannot tell much, except of the two main outliers: Snorlax
+CP 878 and Kingler CP 771.
 
 ```{r, echo=FALSE}
 # Mean and CP per day
@@ -135,10 +134,22 @@ by_date <-summarise(by_date, mean(CP), sd(CP))
 colnames(by_date) <- c("date", "mean", "sd")
 ```
 
+
+The following bar plot displays the mean of CP across the nine days. The relevant detail regarding this plot is that it shows that on the last two days there is an insignificant increase of CP in comparison to the other days. Nevertheless, I cannot confirm that this is related to my progress as player or merely pure luck, because the data is limited, and also because on the last day I caught a Kingler CP 770 which might be responsible for skewing the data.
+
 ```{r, echo=FALSE}
 ggplot(by_date, aes(date,mean)) +
   geom_bar(stat = "identity") +
   ggtitle("Mean of CP over day")
+```
+
+Bonus plots: combat power of all the captured Pokemon and the standard deviation 
+(to complement the mean barplot) of the CP grouped by day.
+
+```{r, echo=FALSE}
+p <- ggplot(cp, aes(index, cp))
+p + geom_point() + geom_smooth(method=lm) +
+  ggtitle("Combat Power of all the captured Pokemon")
 ```
 
 ```{r, echo=FALSE}
@@ -147,51 +158,29 @@ ggplot(by_date, aes(date,sd)) +
   ggtitle("Standard deviation (sd) of CP over day")
 ```
 
-In both of them we can see how on the last days the CP increased.
-
-To conclude this section, I will present all the different combat powers, alongside
-a regression line.
-
-```{r, echo=FALSE}
-p <- ggplot(cp, aes(index, cp))
-p + geom_point() + geom_smooth(method=lm) +
-  ggtitle("Combat Power of all the captured Pokemon")
-```
-
-Once again, more increase.
-
 # Items
 ***
 
 Moving aside from the topic of Pokemon, in this section I will
 focus on the topic of items. As mentioned at the beginning, I hit a total of 271
-Pokestops during the nine days of the experiment, resulting in a considerable amount
-of items - this part is about those items. What's the total of items? How did
-they change overtime? How are they distributed? These are my main questions.
+Pokestops during the nine days of the experiment, resulting in a considerable amount of items - this part is about those items. What's the total of items? How did they change overtime? How are they distributed? These are my main questions.
 
 The total number of items acquired through the Pokestops was 886, an average of 
 3.27 items per Pokestop. In the following table I will present the frequency of
 these items, their percentage, and some basic properties of the dataset regarding
 the quantity of items awarded at each Pokestop.
 
-| Item         | Frequency | Percentage |  Median  | Mean | Max
-| -------------| --------- | ---------- | -------- |------|-----
-| Pokeball     | 546       |  61.62%    | 2.00     | 2.02 | 5.00
-| Great Ball   | 103       |  11.62%    | 0.00     | 0.38 | 2.00
-| Potion       | 65        |  7.33%     | 0.00     | 0.24 | 2.00
-| Super Potion | 41        |  4.62%     | 0.00     | 0.15 | 2.00
-| Hyper Potion | 7         |  0.79%     | 0.00     | 0.03 | 1.00
-| Razz Berry   | 69        |  7.78%     | 0.00     | 0.25 | 2.00
-| Revive       | 55        |  6.20%     | 0.00     | 0.20 | 2.00
+| Item         | Frequency | Percentage |  Median  | Mean | Standard Deviation|Max
+| -------------| --------- | ---------- | -------- |------|-------------------|
+| Pokeball     | 546       |  61.62%    | 2.00     | 2.02 | 1.01 |5.00
+| Great Ball   | 103       |  11.62%    | 0.00     | 0.38 | 0.58 |2.00
+| Potion       | 65        |  7.33%     | 0.00     | 0.24 | 0.47 |2.00
+| Super Potion | 41        |  4.62%     | 0.00     | 0.15 | 0.38 |2.00
+| Hyper Potion | 7         |  0.79%     | 0.00     | 0.03 | 0.16 |1.00
+| Razz Berry   | 69        |  7.78%     | 0.00     | 0.25 | 0.46 |2.00
+| Revive       | 55        |  6.20%     | 0.00     | 0.20 | 0.43 |2.00
 
-According to the data, Pokeballs were the most common item obtained at the Pokestops,
-with a final counter of 546 or 61.62%, a median of 2 per stop, a mean of 2.02, and
-a maximum of 5, meaning that one Pokestop dropped 5 Pokeballs. On the other hand,
-Hyper Potion was the least common item; just 7 of them were acquired (0.79%).
-A peculiarity of this data is the fact that the median of all the items, except
-Pokeball, was 0. The two boxplot below display this; on the Pokeball boxplot
-we can clearly see the bold line that states the median, however the second one
-shows that the data is strongly skewed to the right.
+According to the data presented in the preceding table Pokeballs were the most common item obtained at the Pokestops, with a final counter of 546 or 61.62%, a median of 2 per stop, a mean of 2.02, and a maximum of 5, meaning that one Pokestop dropped 5 Pokeballs. On the other hand, Hyper Potion was the least common item; just 7 of them were acquired (0.79%). A peculiarity of this data is the fact that the median of all the items, except Pokeball, was 0. The two box plot below display this; on the Pokeball box plot we can clearly see the bold line that states the median, however the second one shows that the data is strongly skewed to the right.
 
 ```{r, echo=FALSE}
 items.frequency <- as.data.frame(colSums(items[2:ncol((items))]))
@@ -254,11 +243,7 @@ ggplot(all.potions, aes(x = date, y = value, fill = variable)) +
   xlab("Date") + ylab("Value") + ggtitle("Amount of potions by day")
 ```
 
-The above table and plot showed that "somehow" my assumption was right because after
-the first day (with the exception of the third one), the percentage of Potions decreased, while the number of Super and Hyper Potions incremented. However I wouldn't call this a definitive conclusion due to the small data sample.
-
-The last visualization regarding the topic of items presents the total number of items
-obtained across the seven days.
+The above table and plot showed that "somehow" my assumption was right because after the first day (with the exception of the third one), the percentage of Potions decreased, while the number of Super and Hyper Potions incremented. However I wouldn't call this a definitive conclusion due to the small data sample.
 
 # Drowzees, Pidgeys, CP and HP
 ***
@@ -293,7 +278,7 @@ plot(density(resid(drowzee.lr)), main ='Density plot of the residuals of the Dro
 # sd(drowzee.lr$residuals)
 ```
 
-At the top of the summary of the linear regression are the residuals. The residuals
+At the top of the summary of the linear regression (the table above) are the residuals. The residuals
 are the difference between the real value of the variable and the predicted value
 of the prediction. The residuals for this model are good, the mean practically 0, the standard deviation is 3.89, and a density plot of them shapes a normal distribution.
 
@@ -301,7 +286,7 @@ Another metric that shows that the fit is good is the p-value of the CP variable
 Since p-values are a bit hard to understand, and they are out of the scope of
 this report, just believe me when I say that in this case the smaller the number
 is, the better, and in this particular case the p-value is 
-$2e-16$ which a really small number.
+$2e-16$ which is really small number.
 
 The last metric I will use to analyse the goodness of the model is the R-squared
 or coefficient of determination statistic. Like the p-value, this value is also
@@ -350,7 +335,7 @@ collected from Pokemon Go during the span of nine days. The analysis started wit
 overview of the top Pokemon in my area, Drowzee and Pidgey, the evolution of the
 combat power over time and several stats about it. 
 
-The second topic discuss were the items, and how they are distributed,
+The second topic discuss were the items, and how they are distributed.
 
 For the last topic I introduced two linear regressions to study the relationship
 between the combat power and the hit points of the Pokemon. The results were pretty

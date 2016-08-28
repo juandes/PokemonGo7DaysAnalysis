@@ -1,6 +1,6 @@
 ---
 title: "9 days of Pokemon Go - a statistical analysis"
-author: "Juan De Dios Santos"
+author: "Juan De Dios Santos, @[jdiossantos](https://twitter.com/jdiossantos)"
 date: "August 7, 2016"
 output: html_document
 ---

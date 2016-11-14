@@ -15,4 +15,4 @@ Pokemon increase, and an interesting relationship found the CP and the hit point
 ## Report
 ***
 
-Report is available [here](https://juandes.github.io/PokemonGo9DaysAnalysis/docs/report.html)
+Report is available [9 days of Pokemon Go — a statistical analysis](https://juandes.com/9-days-of-pokemon-go-a-statistical-analysis-3bbad8aaedc2#.xuxs32nnz)

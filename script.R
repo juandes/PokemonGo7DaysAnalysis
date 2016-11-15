@@ -152,6 +152,7 @@ summary(drowzee.lr)
 plot(drowzee$CP, drowzee$HP)
 abline(lm(drowzee$CP~drowzee$HP), col="red")
 hist(drowzee.lr$residuals, breaks = 100)
+mean(drowzee.lr$residuals)
 
 
 ## Pidgey
@@ -164,6 +165,7 @@ summary(pidgey.lr)
 plot(pidgey$HP, pidgey$CP)
 abline(lm(pidgey$CP~pidgey$HP), col="red")
 hist(pidgey$residuals, breaks = 100)
+mean(pidgey.lr$residuals)
 
 cor(drowzee$CP, drowzee$Weight)
 cor(drowzee$CP, drowzee$Height)
